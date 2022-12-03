@@ -1,5 +1,13 @@
 use std::collections::HashSet;
 
+fn compute_val(c: char) -> u64 {
+    if c.is_lowercase() {
+        c as u64 - '`' as u64
+    } else {
+        c as u64 - '&' as u64
+    }
+}
+
 fn main() {
     let file_name = std::env::args()
         .nth(1)
@@ -7,44 +15,25 @@ fn main() {
     let content = std::fs::read_to_string(file_name).expect("failed to read input file");
 
     let priority_sum: u64 = content
-        .trim()
-        .split('\n')
+        .lines()
         .map(|items| {
-            let compartment_data = items.split_at(items.len() / 2);
-            let a: HashSet<char> =
-                HashSet::from_iter::<Vec<char>>(compartment_data.0.chars().collect());
-            let b: HashSet<char> =
-                HashSet::from_iter::<Vec<char>>(compartment_data.1.chars().collect());
-            a.intersection(&b)
-                .map(|&c| {
-                    if c.is_lowercase() {
-                        c as u64 - '`' as u64
-                    } else {
-                        c as u64 - '&' as u64
-                    }
-                })
-                .sum::<u64>()
+            let (compartment_one, compartment_two) = items.split_at(items.len() / 2);
+            let a: HashSet<char> = HashSet::from_iter(compartment_one.chars());
+            let b: HashSet<char> = HashSet::from_iter(compartment_two.chars());
+            a.intersection(&b).map(|&c| compute_val(c)).sum::<u64>()
         })
         .sum();
 
-    let lines: Vec<&str> = content.trim().split('\n').collect();
+    let lines: Vec<&str> = content.lines().collect();
     let chunk_sum: u64 = lines
-        .as_slice()
         .chunks(3)
         .map(|chunk| {
-            let a: HashSet<char> = HashSet::from_iter::<Vec<char>>(chunk[0].chars().collect());
-            let b: HashSet<char> = HashSet::from_iter::<Vec<char>>(chunk[1].chars().collect());
-            let c: HashSet<char> = HashSet::from_iter::<Vec<char>>(chunk[2].chars().collect());
-            let intermediate =
-                HashSet::from_iter::<Vec<char>>(a.intersection(&b).cloned().collect());
+            let a: HashSet<char> = HashSet::from_iter(chunk[0].chars());
+            let b: HashSet<char> = HashSet::from_iter(chunk[1].chars());
+            let c: HashSet<char> = HashSet::from_iter(chunk[2].chars());
+            let intermediate: HashSet<char> = HashSet::from_iter(a.intersection(&b).cloned());
             c.intersection(&intermediate)
-                .map(|&c| {
-                    if c.is_lowercase() {
-                        c as u64 - '`' as u64
-                    } else {
-                        c as u64 - '&' as u64
-                    }
-                })
+                .map(|&c| compute_val(c))
                 .sum::<u64>()
         })
         .sum();
