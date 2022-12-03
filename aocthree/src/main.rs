@@ -27,5 +27,28 @@ fn main() {
         })
         .sum();
 
+    let lines: Vec<&str> = content.trim().split('\n').collect();
+    let chunk_sum: u64 = lines
+        .as_slice()
+        .chunks(3)
+        .map(|chunk| {
+            let a: HashSet<char> = HashSet::from_iter::<Vec<char>>(chunk[0].chars().collect());
+            let b: HashSet<char> = HashSet::from_iter::<Vec<char>>(chunk[1].chars().collect());
+            let c: HashSet<char> = HashSet::from_iter::<Vec<char>>(chunk[2].chars().collect());
+            let intermediate =
+                HashSet::from_iter::<Vec<char>>(a.intersection(&b).cloned().collect());
+            c.intersection(&intermediate)
+                .map(|&c| {
+                    if c.is_lowercase() {
+                        c as u64 - '`' as u64
+                    } else {
+                        c as u64 - '&' as u64
+                    }
+                })
+                .sum::<u64>()
+        })
+        .sum();
+
     println!("[Part 1]: {}", priority_sum);
+    println!("[Part 2]: {}", chunk_sum);
 }
