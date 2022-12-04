@@ -3,5 +3,6 @@
 members = [
     "aocone",
     "aoctwo",
-    "aocthree"
+    "aocthree",
+    "aocfour"
 ]
